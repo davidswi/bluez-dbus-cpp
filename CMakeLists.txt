@@ -33,6 +33,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+add_compile_options(${CMAKE_CXX_FLAGS} -fPIC)
+
 #-------------------------------
 # SOURCE FILES CONFIGURATION
 #-------------------------------
@@ -75,7 +77,7 @@ set( BLUEZ_SOURCES
 	"${BLUEZ_SOURCE_DIR}/Util.cpp" )
 
 
-add_library( bluez-dbus-cpp SHARED
+add_library( bluez-dbus-cpp STATIC
 	${BLUEZ_SOURCES}
 	${BLUEZ_HEADERS} )
 
@@ -84,6 +86,7 @@ target_include_directories( bluez-dbus-cpp PUBLIC
 							$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}> )
 
 option(BUILD_SHARED_LIBS "Build shared libraries (.so) instead of static ones (.a)" ON)
+set(BUILD_SHARED_LIBS OFF)
 
 if(DEFINED BUILD_SHARED_LIBS)
     set_target_properties(bluez-dbus-cpp PROPERTIES POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS})
@@ -96,8 +99,8 @@ set_target_properties(bluez-dbus-cpp
 					OUTPUT_NAME "bluez-dbus-cpp")
 
 # Link up
-find_package(sdbus-c++ REQUIRED)
-target_link_libraries( bluez-dbus-cpp PUBLIC SDBusCpp::sdbus-c++)
+add_subdirectory(sdbus-cpp)
+target_link_libraries( bluez-dbus-cpp PUBLIC sdbus-c++)
 
 #-------------------------------
 # INSTALL
